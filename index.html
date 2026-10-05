@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Unit 2 Health Test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#F2EFF3; --surface:#FFFFFF; --ink:#24192A; --muted:#66586C; --line:#DDD3E0;
+  --accent:#73367A; --accent-soft:#EEDFF0; --good:#2E7D4F; --good-soft:#DDF0E3;
+  --bad:#B3412E; --bad-soft:#F6DFDA;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#17111A; --surface:#211A25; --ink:#EEE6F0; --muted:#A797AD; --line:#3A2F40;
+    --accent:#D49ADB; --accent-soft:#3A2440; --good:#5BC486; --good-soft:#163527;
+    --bad:#F08A76; --bad-soft:#3E211C;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#17111A; --surface:#211A25; --ink:#EEE6F0; --muted:#A797AD; --line:#3A2F40;
+  --accent:#D49ADB; --accent-soft:#3A2440; --good:#5BC486; --good-soft:#163527;
+  --bad:#F08A76; --bad-soft:#3E211C;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45}
+.wrap{max-width:780px;margin:0 auto;padding-inline:16px;padding-block:20px 56px;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:700;margin:0}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,7vw,40px);line-height:1.05;margin:0;text-wrap:balance}
+h2{font-family:var(--display);font-weight:800;font-size:24px;margin:0;text-wrap:balance}
+.how{color:var(--muted);margin:0;max-width:62ch}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.step{font:inherit;font-size:13px;text-align:left;padding:8px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer;display:flex;flex-direction:column;gap:2px;min-width:0}
+.step b{font-family:var(--display);font-size:14px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.step span{font-variant-numeric:tabular-nums}
+.step.on{border-color:var(--accent);background:var(--accent-soft)}
+@media (max-width:560px){.step b{font-size:12px}.step{padding:6px 7px;font-size:11px}}
+.label{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:0}
+.part{display:flex;flex-direction:column;gap:14px}
+.sub{display:flex;align-items:center;gap:12px;font-variant-numeric:tabular-nums}
+.meter{flex:1;height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.sub span{font-size:14px;color:var(--muted);white-space:nowrap}
+.terms{display:flex;flex-wrap:wrap;gap:8px}
+.term{font-family:var(--display);font-weight:600;font-size:16px;padding:9px 14px;border-radius:99px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.term:hover,.def:hover,.opt:hover:not(:disabled){border-color:var(--accent)}
+.defs{display:flex;flex-direction:column;gap:10px}
+.def{text-align:left;font:inherit;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.def .ans{font-family:var(--display);font-weight:600;font-size:14px;color:var(--good)}
+.sel{background:var(--accent-soft)!important;border-color:var(--accent)!important}
+.done{background:var(--good-soft);border-color:var(--good);cursor:default}
+.term.done{color:var(--good)}
+.wrong{background:var(--bad-soft)!important;border-color:var(--bad)!important;animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.q{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.qhead{display:flex;gap:10px;align-items:baseline}
+.qn{font-family:var(--display);font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;flex:none}
+.qt{margin:0;font-weight:700}
+.pg{font-size:13px;color:var(--muted);font-weight:400;white-space:nowrap}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opts.row2{flex-direction:row;flex-wrap:wrap}
+.opt{font:inherit;text-align:left;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;gap:10px;align-items:flex-start}
+.opts.row2 .opt{flex:1;min-width:120px;justify-content:center;font-family:var(--display);font-weight:600}
+.opt .box{flex:none;width:18px;height:18px;margin-top:2px;border-radius:5px;border:1.5px solid var(--muted);display:grid;place-items:center;font-size:13px;line-height:1}
+.opt.sel .box{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.opt:disabled{cursor:default}
+.opt.right{background:var(--good-soft);border-color:var(--good)}
+.opt.miss{background:var(--surface);border-color:var(--good);border-style:dashed}
+.opt.no{background:var(--bad-soft);border-color:var(--bad)}
+.fb{margin:0;padding:10px 12px;border-radius:10px;font-size:15px}
+.fb.ok{background:var(--good-soft)}
+.fb.bad{background:var(--bad-soft)}
+.fb b{font-family:var(--display)}
+.note{font-size:14px;color:var(--muted);margin:0}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{font-family:var(--display);font-weight:600;font-size:16px;padding:11px 18px;border-radius:10px;border:none;background:var(--accent);color:var(--surface);cursor:pointer;align-self:flex-start}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+.big{font-family:var(--display);font-weight:800;font-size:48px;line-height:1;font-variant-numeric:tabular-nums}
+.tally{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.tally div{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:2px}
+.tally b{font-family:var(--display);font-size:22px;font-variant-numeric:tabular-nums}
+.missed{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:10px}
+.missed b{font-family:var(--display)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+[hidden]{display:none!important}
+body{margin:0}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Health · Unit 2 Test Review</p>
+    <h1>Unit 2 Practice Test</h1>
+    <p class="how">Four parts: vocabulary matching, true or false, multiple choice, and select-all-that-apply. Each answer is checked right away, with the textbook page to review. Questions and choices reshuffle every time you retake it.</p>
+  </header>
+  <nav class="steps" id="steps"></nav>
+  <main id="main"></main>
+</div>
+
+<script>
+const VOCAB=[
+["Cognitive empathy","Ability to understand another person's point of view and know what they are thinking or feeling"],
+["Diversity","The differences among people, such as culture, race, ethnicity, religion, abilities, and beliefs"],
+["Emotional empathy","Ability to actually feel or share the emotions another person is experiencing"],
+["Empathy","Ability to understand and share the feelings of another person"],
+["Outlook","A person's general attitude or way of viewing life and the future"],
+["Resilience","Ability to recover, adapt, and bounce back after difficult events or adversity"],
+["Rumination","Repeatedly dwelling on the same negative thoughts, problems, or feelings"],
+["Self-compassion","Treating yourself with kindness and understanding when you fail, make mistakes, or are struggling"],
+["Self-respect","Valuing yourself and believing you deserve to be treated with dignity, including by yourself"],
+["Self-talk","The inner voice and messages you tell yourself, which can be positive or negative"],
+["Toxic stress","Stress from repeated, long-lasting exposure to severe stressors such as neglect, abuse, violence, or loss of a loved one"],
+["Biological sex","Classification as male or female based on physical traits such as chromosomes, hormones, and reproductive organs"],
+["Core values","Deeply held beliefs about what is most important, which guide a person's decisions and behavior"],
+["Relaxation response","Physiological reaction in which the body returns to its resting state after a stressful event"],
+["Burnout","State of emotional, physical, and mental exhaustion caused by prolonged stress"],
+["Body scan","Relaxation technique of paying careful attention to the body, finding signs of tension, and releasing that tension"],
+["Tolerance","Body's need for an increased amount of a substance to experience the effects once felt with smaller amounts"]
+];
+
+const TF=[
+{q:"People with healthy self-esteem often worry about what other people think of them.",a:false,
+ why:"People with healthy self-esteem feel secure in who they are, so they don't constantly worry about others' opinions."},
+{q:"People with low emotional intelligence control their feelings and impulses and act with thought and integrity.",a:false,
+ why:"That describes people with high emotional intelligence. Low emotional intelligence makes it harder to control feelings and impulses."},
+{q:"Feeling happy is easier for people who do not have a mental illness because happiness means you have only positive emotions all the time.",a:false,
+ why:"Happiness does not mean having only positive emotions. Everyone feels negative emotions sometimes, and people with mental illnesses can also experience happiness."},
+{q:"Experiencing adversity decreases a person's resilience, making it harder to recover from future difficult events.",a:false,
+ why:"Working through adversity often builds resilience, making it easier to recover from future difficult events."},
+{q:"If a person confides in you about considering suicide, or if you think someone is considering suicide, you should keep it secret.",a:false,
+ why:"Never keep it secret. Tell a trusted adult right away. You can also call or text 988, the Suicide & Crisis Lifeline."}
+];
+
+const MC=[
+{q:"Which stage of the Mental Health Continuum are you in if you are experiencing sadness and low energy?",pg:104,
+ a:"Reacting",o:["Healthy","Injured","Ill"],
+ why:"In the Reacting stage, people have common, short-term signs of distress such as sadness, nervousness, trouble sleeping, and low energy."},
+{q:"In Maslow's Hierarchy of Human Needs, which needs must be met before anything else?",pg:107,
+ a:"Physiological needs, such as food, water, sleep, and shelter",o:["Safety and security needs","Love and belonging needs","Esteem needs"],
+ why:"Physiological needs form the base of the pyramid. They must be met before a person can focus on higher needs."},
+{q:"Which defense mechanism is the transfer of feelings to another person or object?",pg:130,
+ a:"Displacement",o:["Projection","Denial","Rationalization"],
+ why:"Displacement moves feelings onto a safer target, like yelling at a sibling when you're actually angry at a coach."},
+{q:"Are your responses to different stressors in or out of your field of control?",pg:151,
+ a:"In your field of control",o:["Out of your field of control","Only in your control when the stressor is small","Only in your control as an adult"],
+ why:"You can't always control the stressor, but you can always control how you respond to it."},
+{q:"Do people with resilience have negative or positive views of themselves?",pg:165,
+ a:"Positive views of themselves",o:["Negative views of themselves","Neither; resilience is unrelated to self-view"],
+ why:"Resilient people tend to have a positive view of themselves and confidence in their ability to handle challenges."},
+{q:"Is \"Change is impossible\" a good example of positive self-talk?",pg:196,
+ a:"No, it is negative self-talk",o:["Yes, it is realistic positive self-talk","Yes, because it prevents disappointment"],
+ why:"\"Change is impossible\" is negative self-talk. A positive version would be \"Change is hard, but I can take it one step at a time.\""},
+{q:"Which illness involves difficulty paying attention, overly active behavior, and impulsiveness?",pg:214,
+ a:"Attention-deficit/hyperactivity disorder (ADHD)",o:["Bipolar disorder","Obsessive-compulsive disorder (OCD)","Autism spectrum disorder"],
+ why:"Inattention, hyperactivity, and impulsivity are the three hallmark signs of ADHD."},
+{q:"Which personality disorder involves an exaggerated sense of one's own importance, a deep need for excessive attention, and a lack of empathy?",pg:217,
+ a:"Narcissistic personality disorder",o:["Borderline personality disorder","Antisocial personality disorder","Avoidant personality disorder"],
+ why:"Grandiosity, a need for admiration, and a lack of empathy define narcissistic personality disorder."},
+{q:"What is the order of the 5 stages of grief?",pg:238,
+ a:"Denial → Anger → Bargaining → Depression → Acceptance",
+ o:["Anger → Denial → Depression → Bargaining → Acceptance","Denial → Bargaining → Anger → Acceptance → Depression","Depression → Denial → Anger → Bargaining → Acceptance"],
+ why:"A memory trick is DABDA: Denial, Anger, Bargaining, Depression, Acceptance."},
+{q:"In which stage of grief do people often feel out of control and helpless in the face of death?",pg:238,
+ a:"Bargaining",o:["Denial","Anger","Acceptance"],
+ why:"In bargaining, people feel helpless and try to regain control, often with \"if only\" or \"what if\" thoughts."}
+];
+
+const MULTI=[
+{q:"Which are characteristics of a person who has a \"sense of balance\"?",pg:103,
+ a:["Gives time and attention to all areas of health","Sets priorities and manages time well","Makes time for rest and fun, not just work"],
+ o:["Puts all their energy into a single goal","Agrees to every request so no one is disappointed"],
+ why:"A sense of balance means no single area of life crowds out the others."},
+{q:"Which describe a positive environment that can build self-esteem?",pg:125,
+ a:["Supportive people who encourage you","Feeling safe and respected","Receiving praise for effort and growth"],
+ o:["Frequent criticism or put-downs","Being compared to others constantly"],
+ why:"Positive environments offer support, safety, respect, and encouragement."},
+{q:"Which describe a negative environment that can harm self-esteem?",pg:125,
+ a:["Bullying or teasing","Constant criticism","Neglect or abuse"],
+ o:["Encouragement from friends and family","Celebrating your accomplishments"],
+ why:"Negative environments include bullying, criticism, neglect, abuse, and unfair comparisons."},
+{q:"Which are healthy, positive ways to accept and express your emotions?",pg:133,
+ a:["Talking with a trusted friend or adult","Writing in a journal","Being physically active","Creating art or music"],
+ o:["Bottling feelings up so no one sees them","Lashing out at others"],
+ why:"Healthy expression lets you name and release feelings without hurting yourself or others."},
+{q:"Which are benefits of happiness?",pg:143,
+ a:["Better physical health, such as a stronger immune system","Stronger relationships","Lower stress and better coping","More creativity and productivity"],
+ o:["Never feeling sadness again"],
+ why:"Happiness supports physical health, relationships, and coping, but it does not remove negative emotions."},
+{q:"Which are tendencies of teens who focus on finding meaning and purpose in life?",pg:145,
+ a:["More engaged in school and activities","Set goals and keep working toward them","Higher well-being and life satisfaction","Less likely to take part in risky behaviors"],
+ o:["More likely to misuse substances"],
+ why:"A sense of purpose is linked to engagement, motivation, well-being, and fewer risky behaviors."},
+{q:"Which are characteristics of people with empathy?",pg:162,
+ a:["Listen carefully to others","Notice how others are feeling","Show kindness and compassion","Are open-minded and nonjudgmental"],
+ o:["Focus mainly on their own needs"],
+ why:"Empathetic people pay attention to others' feelings and respond with care."},
+{q:"Which are healthy practices for self-compassion?",pg:168,
+ a:["Speak to yourself the way you would speak to a good friend","Accept that mistakes are part of being human","Notice painful feelings mindfully without judging them","Take care of your body and needs"],
+ o:["Criticize yourself harshly so you'll do better","Replay your mistakes over and over"],
+ why:"Self-compassion means kindness toward yourself, common humanity, and mindfulness. Harsh criticism and rumination work against it."},
+{q:"Which are impacts that stress has on the cardiovascular system?",pg:186,
+ a:["Increased heart rate","Increased blood pressure","Higher risk of heart disease, heart attack, and stroke"],
+ o:["Permanently lowered blood pressure","Stronger, healthier blood vessels"],
+ why:"Stress hormones speed the heart and raise blood pressure. Over time, chronic stress raises the risk of heart disease and stroke."},
+{q:"Which are examples of stigmas associated with mental illness?",pg:228,
+ a:["People with mental illness are dangerous or violent","Mental illness is a sign of weakness","People could just \"snap out of it\" if they tried","People with mental illness can't recover"],
+ o:["Mental illness is a treatable health condition"],
+ why:"Stigmas are negative, false, unfair beliefs. Mental illnesses are real health conditions that can be treated."}
+];
+
+const $=id=>document.getElementById(id);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const PARTS=[
+ {key:'vocab',name:'Vocabulary',total:VOCAB.length},
+ {key:'tf',name:'True/False',total:TF.length},
+ {key:'mc',name:'Multiple choice',total:MC.length},
+ {key:'multi',name:'Select all',total:MULTI.length},
+ {key:'results',name:'Results'}
+];
+let S, cur=0;
+
+function newTest(){
+  S={
+    vocab:{order:null,page:0,missed:new Set(),done:0,finished:false},
+    tf:{order:shuffle(TF.map((_,i)=>i)),ans:{}},
+    mc:{order:shuffle(MC.map((_,i)=>i)),opts:MC.map(m=>shuffle([m.a,...m.o])),ans:{}},
+    multi:{order:shuffle(MULTI.map((_,i)=>i)),opts:MULTI.map(m=>shuffle([...m.a,...m.o])),pick:{},ans:{}}
+  };
+  const p=shuffle(VOCAB.map((_,i)=>i)); S.vocab.order=[p.slice(0,9),p.slice(9)];
+  go(0);
+}
+function partScore(k){
+  if(k==='vocab'){const v=S.vocab;return {done:v.done,right:v.done-[...v.missed].filter(i=>v.matched?.has(i)).length,total:VOCAB.length}}
+  const st=S[k];const vals=Object.values(st.ans);return {done:vals.length,right:vals.filter(Boolean).length,total:PARTS.find(p=>p.key===k).total};
+}
+function vocabRight(){return VOCAB.length-S.vocab.missed.size}
+function drawSteps(){
+  $('steps').innerHTML='';
+  PARTS.forEach((p,i)=>{
+    const b=document.createElement('button');b.className='step'+(i===cur?' on':'');
+    let sub='';
+    if(p.key==='results') sub='Score';
+    else if(p.key==='vocab') sub=`${S.vocab.done}/${p.total} done`;
+    else sub=`${Object.keys(S[p.key].ans).length}/${p.total} done`;
+    b.innerHTML=`<b>${esc(p.name)}</b><span>${sub}</span>`;
+    b.onclick=()=>go(i);
+    $('steps').append(b);
+  });
+}
+function go(i){cur=i;drawSteps();const k=PARTS[i].key;
+  ({vocab:drawVocab,tf:drawTF,mc:drawMC,multi:drawMulti,results:drawResults})[k]();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function nextBtn(label){const b=document.createElement('button');b.className='btn';b.textContent=label;b.onclick=()=>go(cur+1);return b}
+
+/* ---------- Part 1: matching ---------- */
+let selT=null,selD=null;
+function drawVocab(){
+  const v=S.vocab, ids=v.order[v.page];
+  const m=$('main'); m.innerHTML='';
+  const part=document.createElement('section');part.className='part';
+  part.innerHTML=`<h2>Part 1: Vocabulary matching</h2>
+   <p class="note">Tap a term, then tap its definition. Page ${v.page+1} of 2 (${v.order[0].length} terms, then ${v.order[1].length}).</p>
+   <div class="sub"><div class="meter"><i style="width:${v.done/VOCAB.length*100}%"></i></div><span>${v.done} of ${VOCAB.length} matched</span></div>
+   <p class="label">Terms</p><div class="terms" id="terms"></div>
+   <p class="label">Definitions</p><div class="defs" id="defs"></div>
+   <div class="row" id="vnav"></div>`;
+  m.append(part);
+  v.matched=v.matched||new Set();
+  selT=selD=null;
+  shuffle(ids).forEach(i=>{const b=document.createElement('button');b.className='term'+(v.matched.has(i)?' done':'');b.textContent=VOCAB[i][0];b.dataset.i=i;b.onclick=()=>pickV('t',b);$('terms').append(b)});
+  shuffle(ids).forEach(i=>{const b=document.createElement('button');b.className='def'+(v.matched.has(i)?' done':'');b.dataset.i=i;
+    if(v.matched.has(i)){const a=document.createElement('span');a.className='ans';a.textContent='✓ '+VOCAB[i][0];b.append(a)}
+    const d=document.createElement('span');d.textContent=VOCAB[i][1];b.append(d);b.onclick=()=>pickV('d',b);$('defs').append(b)});
+  vnav();
+}
+function vnav(){
+  const v=S.vocab,n=$('vnav');n.innerHTML='';
+  const pageDone=v.order[v.page].every(i=>v.matched.has(i));
+  if(v.page===0){const b=document.createElement('button');b.className='btn';b.textContent='Next page';b.disabled=!pageDone;b.onclick=()=>{v.page=1;drawVocab();window.scrollTo({top:0,behavior:'smooth'})};n.append(b)}
+  else{
+    const back=document.createElement('button');back.className='btn ghost';back.textContent='Previous page';back.onclick=()=>{v.page=0;drawVocab()};n.append(back);
+    const b=nextBtn('Go to Part 2');b.disabled=!pageDone;n.append(b);
+  }
+}
+function pickV(kind,el){
+  if(el.classList.contains('done'))return;
+  if(kind==='t'){if(selT)selT.classList.remove('sel');selT=selT===el?null:el}else{if(selD)selD.classList.remove('sel');selD=selD===el?null:el}
+  if(el===selT||el===selD)el.classList.add('sel');
+  if(selT&&selD){
+    const t=selT,d=selD;t.classList.remove('sel');d.classList.remove('sel');selT=selD=null;
+    const v=S.vocab;
+    if(t.dataset.i===d.dataset.i){
+      const i=+t.dataset.i;v.matched.add(i);v.done++;
+      t.classList.add('done');d.classList.add('done');
+      const a=document.createElement('span');a.className='ans';a.textContent='✓ '+t.textContent;d.prepend(a);
+      document.querySelector('.meter i').style.width=(v.done/VOCAB.length*100)+'%';
+      document.querySelector('.sub span').textContent=`${v.done} of ${VOCAB.length} matched`;
+      drawSteps();vnav();
+    }else{
+      v.missed.add(+t.dataset.i);v.missed.add(+d.dataset.i);
+      [t,d].forEach(e=>{e.classList.add('wrong');setTimeout(()=>e.classList.remove('wrong'),450)});
+    }
+  }
+}
+
+/* ---------- shared question card ---------- */
+function card(n,text,pg){
+  const q=document.createElement('div');q.className='q';
+  q.innerHTML=`<div class="qhead"><span class="qn">${n}.</span><p class="qt">${esc(text)}${pg?` <span class="pg">(pg. ${pg})</span>`:''}</p></div>`;
+  return q;
+}
+function fb(q,ok,html){const p=document.createElement('p');p.className='fb '+(ok?'ok':'bad');p.innerHTML=html;q.append(p)}
+function partShell(title,note){
+  const m=$('main');m.innerHTML='';
+  const s=document.createElement('section');s.className='part';
+  s.innerHTML=`<h2>${title}</h2><p class="note">${note}</p>`;m.append(s);return s;
+}
+
+/* ---------- Part 2: true/false ---------- */
+function drawTF(){
+  const s=partShell('Part 2: True or false','Remember: if any part of the statement is false, the whole statement is false.');
+  S.tf.order.forEach((qi,n)=>{
+    const it=TF[qi],q=card(n+1,it.q);const o=document.createElement('div');o.className='opts row2';
+    [true,false].forEach(val=>{
+      const b=document.createElement('button');b.className='opt';b.textContent=val?'True':'False';
+      const answered=qi in S.tf.ans;
+      if(answered){b.disabled=true;if(val===it.a)b.classList.add('right');else if(S.tf.chosen?.[qi]===val)b.classList.add('no')}
+      b.onclick=()=>{S.tf.ans[qi]=(val===it.a);(S.tf.chosen=S.tf.chosen||{})[qi]=val;drawTF();drawSteps()};
+      o.append(b);
+    });
+    q.append(o);
+    if(qi in S.tf.ans)fb(q,S.tf.ans[qi],`<b>${S.tf.ans[qi]?'Correct.':'Not quite.'}</b> The answer is <b>${it.a?'True':'False'}</b>. ${esc(it.why)}`);
+    s.append(q);
+  });
+  s.append(nextBtn('Go to Part 3'));
+}
+
+/* ---------- Part 3: multiple choice ---------- */
+function drawMC(){
+  const s=partShell('Part 3: Multiple choice','Choose the best answer.');
+  S.mc.order.forEach((qi,n)=>{
+    const it=MC[qi],q=card(n+1,it.q,it.pg);const o=document.createElement('div');o.className='opts';
+    const answered=qi in S.mc.ans;
+    S.mc.opts[qi].forEach(txt=>{
+      const b=document.createElement('button');b.className='opt';b.textContent=txt;
+      if(answered){b.disabled=true;if(txt===it.a)b.classList.add('right');else if(S.mc.chosen?.[qi]===txt)b.classList.add('no')}
+      b.onclick=()=>{S.mc.ans[qi]=(txt===it.a);(S.mc.chosen=S.mc.chosen||{})[qi]=txt;drawMC();drawSteps()};
+      o.append(b);
+    });
+    q.append(o);
+    if(answered)fb(q,S.mc.ans[qi],`<b>${S.mc.ans[qi]?'Correct.':'Not quite.'}</b> ${esc(it.why)}`);
+    s.append(q);
+  });
+  s.append(nextBtn('Go to Part 4'));
+}
+
+/* ---------- Part 4: select all ---------- */
+function drawMulti(){
+  const s=partShell('Part 4: Select all that apply','Pick every correct answer, then tap Check. You need all the right ones and none of the wrong ones to get credit.');
+  S.multi.order.forEach((qi,n)=>{
+    const it=MULTI[qi],q=card(n+1,it.q,it.pg);const o=document.createElement('div');o.className='opts';
+    const answered=qi in S.multi.ans;const picked=S.multi.pick[qi]=S.multi.pick[qi]||new Set();
+    S.multi.opts[qi].forEach(txt=>{
+      const b=document.createElement('button');b.className='opt'+(picked.has(txt)?' sel':'');
+      const isRight=it.a.includes(txt);
+      b.innerHTML=`<span class="box">${picked.has(txt)?'✓':''}</span><span></span>`;b.lastChild.textContent=txt;
+      if(answered){b.disabled=true;b.classList.remove('sel');
+        if(isRight&&picked.has(txt))b.classList.add('right');
+        else if(isRight)b.classList.add('miss');
+        else if(picked.has(txt))b.classList.add('no');
+        b.firstChild.textContent=isRight?'✓':(picked.has(txt)?'✗':'');
+      }
+      b.onclick=()=>{picked.has(txt)?picked.delete(txt):picked.add(txt);drawMultiKeep()};
+      o.append(b);
+    });
+    q.append(o);
+    if(answered){
+      fb(q,S.multi.ans[qi],`<b>${S.multi.ans[qi]?'Correct.':'Not quite.'}</b> ${S.multi.ans[qi]?'':'Dashed boxes are correct answers you missed. '}${esc(it.why)}`);
+    }else{
+      const c=document.createElement('button');c.className='btn ghost';c.textContent='Check';c.disabled=picked.size===0;
+      c.onclick=()=>{S.multi.ans[qi]=it.a.length===picked.size&&it.a.every(x=>picked.has(x));drawMultiKeep();drawSteps()};
+      q.append(c);
+    }
+    s.append(q);
+  });
+  s.append(nextBtn('See results'));
+}
+function drawMultiKeep(){const y=window.scrollY;drawMulti();window.scrollTo(0,y)}
+
+/* ---------- Results ---------- */
+function drawResults(){
+  const vr=S.vocab.done?vocabRight():0;
+  const tf=Object.values(S.tf.ans).filter(Boolean).length,mc=Object.values(S.mc.ans).filter(Boolean).length,mu=Object.values(S.multi.ans).filter(Boolean).length;
+  const total=VOCAB.length+TF.length+MC.length+MULTI.length,right=(S.vocab.done===VOCAB.length?vr:0)+tf+mc+mu;
+  const unanswered=(VOCAB.length-S.vocab.done)+(TF.length-Object.keys(S.tf.ans).length)+(MC.length-Object.keys(S.mc.ans).length)+(MULTI.length-Object.keys(S.multi.ans).length);
+  const s=partShell('Results',unanswered?`${unanswered} question${unanswered>1?'s are':' is'} still unanswered. Unanswered questions count as wrong.`:'Every question answered. Vocabulary counts terms you matched on the first try.');
+  const box=document.createElement('div');box.style.cssText='display:flex;flex-direction:column;gap:14px';
+  box.innerHTML=`<div><p class="label">Total score</p><div class="big">${right}/${total} <span style="font-size:22px;color:var(--muted)">${Math.round(right/total*100)}%</span></div></div>
+   <div class="tally">
+    <div><span class="label">Vocabulary</span><b>${S.vocab.done===VOCAB.length?vr:0}/${VOCAB.length}</b></div>
+    <div><span class="label">True/False</span><b>${tf}/${TF.length}</b></div>
+    <div><span class="label">Multiple choice</span><b>${mc}/${MC.length}</b></div>
+    <div><span class="label">Select all</span><b>${mu}/${MULTI.length}</b></div>
+   </div>`;
+  s.append(box);
+  const items=[];
+  if(S.vocab.done===VOCAB.length)[...S.vocab.missed].forEach(i=>items.push(`<li><b>${esc(VOCAB[i][0])}</b>: ${esc(VOCAB[i][1])}</li>`));
+  TF.forEach((t,i)=>{if(S.tf.ans[i]===false)items.push(`<li><b>False:</b> ${esc(t.q)} ${esc(t.why)}</li>`)});
+  MC.forEach((m,i)=>{if(S.mc.ans[i]===false)items.push(`<li>${esc(m.q)} <b>${esc(m.a)}</b> <span class="pg">(pg. ${m.pg})</span></li>`)});
+  MULTI.forEach((m,i)=>{if(S.multi.ans[i]===false)items.push(`<li>${esc(m.q)} <b>${m.a.map(esc).join('; ')}</b> <span class="pg">(pg. ${m.pg})</span></li>`)});
+  if(items.length){const h=document.createElement('p');h.className='label';h.textContent='Review these';s.append(h);const ul=document.createElement('ul');ul.className='missed';ul.innerHTML=items.join('');s.append(ul)}
+  else if(!unanswered){const p=document.createElement('p');p.textContent='Perfect score. You are ready for the Unit 2 test.';p.style.margin='0';s.append(p)}
+  const r=document.createElement('div');r.className='row';
+  const again=document.createElement('button');again.className='btn';again.textContent='Retake with new shuffle';again.onclick=newTest;r.append(again);
+  s.append(r);
+}
+newTest();
+</script>
+
+</body>
+</html>
