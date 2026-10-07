@@ -105,119 +105,84 @@ body{margin:0}
     <h1>Unit 2 Practice Test</h1>
     <p class="how">Four parts: vocabulary matching, true or false, multiple choice, and select-all-that-apply. Each answer is checked right away, with the textbook page to review. Questions and choices reshuffle every time you retake it.</p>
   </header>
+  <div class="row" style="align-items:center"><button class="btn ghost" id="reshuffle" type="button">Shuffle questions and answers</button><span class="note" id="shufnote">Starts over with a new random order.</span></div>
   <nav class="steps" id="steps"></nav>
   <main id="main"></main>
 </div>
 
 <script>
 const VOCAB=[
-["Cognitive empathy","Ability to understand another person's point of view and know what they are thinking or feeling"],
-["Diversity","The differences among people, such as culture, race, ethnicity, religion, abilities, and beliefs"],
-["Emotional empathy","Ability to actually feel or share the emotions another person is experiencing"],
-["Empathy","Ability to understand and share the feelings of another person"],
-["Outlook","A person's general attitude or way of viewing life and the future"],
-["Resilience","Ability to recover, adapt, and bounce back after difficult events or adversity"],
 ["Rumination","Repeatedly dwelling on the same negative thoughts, problems, or feelings"],
 ["Self-compassion","Treating yourself with kindness and understanding when you fail, make mistakes, or are struggling"],
-["Self-respect","Valuing yourself and believing you deserve to be treated with dignity, including by yourself"],
-["Self-talk","The inner voice and messages you tell yourself, which can be positive or negative"],
-["Toxic stress","Stress from repeated, long-lasting exposure to severe stressors such as neglect, abuse, violence, or loss of a loved one"],
-["Biological sex","Classification as male or female based on physical traits such as chromosomes, hormones, and reproductive organs"],
-["Core values","Deeply held beliefs about what is most important, which guide a person's decisions and behavior"],
-["Relaxation response","Physiological reaction in which the body returns to its resting state after a stressful event"],
+["Resilience","Ability to recover, adapt, and bounce back after difficult events or adversity"],
+["Empathy","Ability to understand and share the feelings of another person"],
 ["Burnout","State of emotional, physical, and mental exhaustion caused by prolonged stress"],
+["Self-respect","Valuing yourself and believing you deserve to be treated with dignity, including by yourself"],
+["Relaxation response","Physiological reaction in which the body returns to its resting state after a stressful event"],
+["Emotional empathy","Ability to actually feel or share the emotions another person is experiencing"],
+["Core values","Deeply held beliefs about what is most important, which guide a person's decisions and behavior"],
+["Self-talk","The inner voice and messages you tell yourself, which can be positive or negative"],
 ["Body scan","Relaxation technique of paying careful attention to the body, finding signs of tension, and releasing that tension"],
-["Tolerance","Body's need for an increased amount of a substance to experience the effects once felt with smaller amounts"]
+["Biological sex","Classification as male or female based on physical traits such as chromosomes, hormones, and reproductive organs"],
+["Cognitive empathy","Ability to understand another person's point of view and know what they are thinking or feeling"],
+["Tolerance","Body's need for an increased amount of a substance to experience the effects once felt with smaller amounts"],
+["Toxic stress","Stress from repeated, long-lasting exposure to severe stressors such as neglect, abuse, violence, or loss of a loved one"],
+["Diversity","The differences among people, such as culture, race, ethnicity, religion, abilities, and beliefs"],
+["Outlook","A person's general attitude or way of viewing life and the future"]
 ];
 
-const TF=[
-{q:"People with healthy self-esteem often worry about what other people think of them.",a:false,
- why:"People with healthy self-esteem feel secure in who they are, so they don't constantly worry about others' opinions."},
-{q:"People with low emotional intelligence control their feelings and impulses and act with thought and integrity.",a:false,
- why:"That describes people with high emotional intelligence. Low emotional intelligence makes it harder to control feelings and impulses."},
-{q:"Feeling happy is easier for people who do not have a mental illness because happiness means you have only positive emotions all the time.",a:false,
- why:"Happiness does not mean having only positive emotions. Everyone feels negative emotions sometimes, and people with mental illnesses can also experience happiness."},
-{q:"Experiencing adversity decreases a person's resilience, making it harder to recover from future difficult events.",a:false,
- why:"Working through adversity often builds resilience, making it easier to recover from future difficult events."},
-{q:"If a person confides in you about considering suicide, or if you think someone is considering suicide, you should keep it secret.",a:false,
- why:"Never keep it secret. Tell a trusted adult right away. You can also call or text 988, the Suicide & Crisis Lifeline."}
+const TF_ALL=[
+{f:{q:"People with healthy self-esteem often worry about what other people think of them.",
+    why:"People with healthy self-esteem feel secure in who they are, so they don't constantly worry about others' opinions."},
+ t:{q:"People with healthy self-esteem do not spend a lot of time worrying about what other people think of them.",
+    why:"Healthy self-esteem means feeling secure in who you are, so others' opinions don't control you."}},
+{f:{q:"People with low emotional intelligence control their feelings and impulses and act with thought and integrity.",
+    why:"That describes people with high emotional intelligence. Low emotional intelligence makes feelings and impulses harder to control."},
+ t:{q:"People with high emotional intelligence control their feelings and impulses and act with thought and integrity.",
+    why:"Controlling feelings and impulses and acting with thought and integrity are signs of high emotional intelligence."}},
+{f:{q:"Feeling happy is easier for people who do not have a mental illness because happiness means you have only positive emotions all the time.",
+    why:"Happiness does not mean having only positive emotions. Everyone feels negative emotions sometimes, and people with mental illnesses can also experience happiness."},
+ t:{q:"Happiness does not mean having only positive emotions all the time, and people with a mental illness can also experience happiness.",
+    why:"Everyone feels negative emotions sometimes. Being happy doesn't require only positive emotions, and people with mental illnesses can feel happy too."}},
+{f:{q:"Experiencing adversity decreases a person's resilience, making it harder to recover from future difficult events.",
+    why:"Working through adversity often builds resilience, making it easier to recover from future difficult events."},
+ t:{q:"Experiencing adversity can increase a person's resilience, making it easier to recover from future difficult events.",
+    why:"Working through hard times builds resilience, which helps people recover from later difficulties."}},
+{f:{q:"If a person confides in you about considering suicide, or if you think someone is considering suicide, you should keep it secret.",
+    why:"Never keep it secret. Tell a trusted adult right away. You can also call or text 988, the Suicide & Crisis Lifeline."},
+ t:{q:"If a person confides in you about considering suicide, or if you think someone is considering suicide, you should tell a trusted adult right away instead of keeping it secret.",
+    why:"Getting help quickly matters more than keeping a secret. You can also call or text 988, the Suicide & Crisis Lifeline."}}
 ];
+let TF=[];
+function pickTF(){
+  const idx=shuffle(TF_ALL.map((_,i)=>i)), nTrue=2+Math.floor(Math.random()*2), tset=new Set(idx.slice(0,nTrue));
+  TF=TF_ALL.map((x,i)=>tset.has(i)?{q:x.t.q,a:true,why:x.t.why}:{q:x.f.q,a:false,why:x.f.why});
+}
 
 const MC=[
-{q:"Which stage of the Mental Health Continuum are you in if you are experiencing sadness and low energy?",pg:104,
- a:"Reacting",o:["Healthy","Injured","Ill"],
- why:"The continuum goes Healthy → Reacting → Injured → Ill. Sadness and low energy are signs of the Reacting stage."},
-{q:"In Maslow's Hierarchy of Human Needs, which needs must be met before anything else?",pg:107,
- a:"Physical needs",o:["Security needs","Love and acceptance needs","Esteem needs","Self-actualization"],
- why:"The order is physical needs → security → love and acceptance → esteem → self-actualization. Physical needs come first."},
-{q:"Which defense mechanism is the transfer of feelings to another person or object?",pg:130,
- a:"Displacement",o:["Denial","Intellectualization","Projection","Rationalization","Reaction formation","Regression","Repression"],
- why:"Displacement moves feelings onto another person or object, like yelling at a sibling when you're actually angry at a coach."},
-{q:"Are your responses to different stressors in or out of your field of control?",pg:151,
- a:"In your field of control",o:["Out of your field of control"],
- why:"You can't always control the stressor, but your response to it is in your control."},
-{q:"Do people with resilience have negative or positive views of themselves?",pg:165,
- a:"Positive views of themselves",o:["Negative views of themselves"],
- why:"Resilient people have positive views of themselves and confidence in their strengths and abilities."},
-{q:"Is \"Change is impossible\" a good example of positive self-talk?",pg:196,
- a:"No",o:["Yes"],
- why:"\"Change is impossible\" is negative self-talk."},
-{q:"Which illness involves difficulty paying attention, overly active behavior, and impulsiveness?",pg:214,
- a:"ADHD (attention-deficit/hyperactivity disorder)",o:["Bipolar disorder","Obsessive-compulsive disorder (OCD)","Autism spectrum disorder"],
- why:"Trouble paying attention, overly active behavior, and impulsiveness are the signs of ADHD."},
-{q:"Which personality disorder involves an exaggerated sense of one's own importance, a deep need for excessive attention, and a lack of empathy?",pg:217,
- a:"Narcissistic personality disorder",o:["Borderline personality disorder","Antisocial personality disorder","Obsessive-compulsive personality disorder","Paranoid personality disorder","Schizoid personality disorder"],
- why:"An exaggerated sense of importance, a need for excessive attention, and a lack of empathy define narcissistic personality disorder."},
-{q:"What is the order of the 5 stages of grief?",pg:238,
- a:"Denial → Anger → Bargaining → Depression → Acceptance",
- o:["Anger → Denial → Depression → Bargaining → Acceptance","Denial → Bargaining → Anger → Acceptance → Depression","Depression → Denial → Anger → Bargaining → Acceptance"],
- why:"Memory trick: DABDA (Denial, Anger, Bargaining, Depression, Acceptance). Likely to be on the test."},
-{q:"In which stage of grief do people often feel out of control and helpless in the face of death?",pg:238,
- a:"Bargaining",o:["Denial","Anger","Depression","Acceptance"],
- why:"In bargaining, people feel out of control and helpless and try to regain control."}
+{"q":"Which personality disorder involves an exaggerated sense of one's own importance, a deep need for excessive attention, and a lack of empathy?","pg":217,"a":"Narcissistic personality disorder","o":["Borderline personality disorder","Paranoid personality disorder","Obsessive-compulsive personality disorder","Antisocial personality disorder","Schizoid personality disorder"],"why":"An exaggerated sense of importance, a need for excessive attention, and a lack of empathy define narcissistic personality disorder."},
+{"q":"Which stage of the Mental Health Continuum are you in if you are experiencing sadness and low energy?","pg":104,"a":"Reacting","o":["Healthy","Ill","Injured"],"why":"The continuum goes Healthy → Reacting → Injured → Ill. Sadness and low energy are signs of the Reacting stage."},
+{"q":"Which defense mechanism is the transfer of feelings to another person or object?","pg":130,"a":"Displacement","o":["Reaction formation","Projection","Intellectualization","Denial","Rationalization","Regression","Repression"],"why":"Displacement moves feelings onto another person or object, like yelling at a sibling when you're actually angry at a coach."},
+{"q":"Are your responses to different stressors in or out of your field of control?","pg":151,"a":"In your field of control","o":["Out of your field of control"],"why":"You can't always control the stressor, but your response to it is in your control."},
+{"q":"In Maslow's Hierarchy of Human Needs, which needs must be met before anything else?","pg":107,"a":"Physical needs","o":["Self-actualization","Love and acceptance needs","Security needs","Esteem needs"],"why":"The order is physical needs → security → love and acceptance → esteem → self-actualization. Physical needs come first."},
+{"q":"Is \"Change is impossible\" a good example of positive self-talk?","pg":196,"a":"No","o":["Yes"],"why":"\"Change is impossible\" is negative self-talk."},
+{"q":"Do people with resilience have negative or positive views of themselves?","pg":165,"a":"Positive views of themselves","o":["Negative views of themselves"],"why":"Resilient people have positive views of themselves and confidence in their strengths and abilities."},
+{"q":"What is the order of the 5 stages of grief?","pg":238,"a":"Denial → Anger → Bargaining → Depression → Acceptance","o":["Denial → Bargaining → Anger → Acceptance → Depression","Anger → Denial → Depression → Bargaining → Acceptance","Depression → Denial → Anger → Bargaining → Acceptance"],"why":"Memory trick: DABDA (Denial, Anger, Bargaining, Depression, Acceptance). Likely to be on the test."},
+{"q":"In which stage of grief do people often feel out of control and helpless in the face of death?","pg":238,"a":"Bargaining","o":["Denial","Depression","Anger","Acceptance"],"why":"In bargaining, people feel out of control and helpless and try to regain control."},
+{"q":"Which illness involves difficulty paying attention, overly active behavior, and impulsiveness?","pg":214,"a":"ADHD (attention-deficit/hyperactivity disorder)","o":["Autism spectrum disorder","Obsessive-compulsive disorder (OCD)","Bipolar disorder"],"why":"Trouble paying attention, overly active behavior, and impulsiveness are the signs of ADHD."}
 ];
 
 const MULTI=[
-{q:"Which are characteristics of a person who has a \"sense of balance\"?",pg:103,
- a:["Enjoys spending time with others","Feels comfortable spending time alone"],
- o:["Avoids being alone whenever possible","Avoids spending time with others"],
- why:"A person with a sense of balance enjoys time with others and is also comfortable alone."},
-{q:"Which describe a positive environment that can build self-esteem?",pg:125,
- a:["Being supported for your successes","Being supported when situations don't go your way"],
- o:["Being criticized for any shortcomings","Being held to impossibly high standards"],
- why:"In a positive environment, people are supported both when they succeed and when things go wrong."},
-{q:"Which describe a negative environment that can harm self-esteem?",pg:125,
- a:["Being criticized for any shortcomings","Being blamed for failures and disappointments","Being held to impossibly high standards"],
- o:["Being supported for your successes","Being supported when situations don't go your way"],
- why:"Negative environments criticize shortcomings, blame people for failures, and set impossibly high standards."},
-{q:"Which are healthy, positive ways to accept and express your emotions?",pg:133,
- a:["Sharing with friends, family, or a trusted adult","Writing in a journal","Crying","Taking a walk or run","Doing an activity you enjoy","Taking a long bath or shower","Finding a reason to laugh","Documenting a positive moment"],
- o:["Bottling feelings up so no one sees them","Lashing out at others"],
- why:"The book also lists reducing stress. Healthy expression lets feelings out without hurting yourself or others."},
-{q:"Which are benefits of happiness?",pg:143,
- a:["Reduced risk of health conditions","Faster recovery from health conditions","Longer life","Better mental and emotional health","Lower levels of stress and anxiety","Stronger support system","Better health habits"],
- o:["Never feeling sadness again","Never getting sick"],
- why:"Happiness brings many health benefits, but it does not remove negative emotions or illness entirely."},
-{q:"Which are tendencies of teens who focus on finding meaning and purpose in life?",pg:145,
- a:["Do what they love instead of what they think others want them to do","Work with other people instead of competing against them","Find inspiring mentors, such as parents, teachers, and coaches","Spend time in the community through a part-time job, volunteering, or causes","Learn from failure, which teaches resilience and persistence","Hold beliefs in causes or ideas bigger than themselves"],
- o:["Do whatever others expect of them","Avoid failure at all costs"],
- why:"Teens focused on purpose follow what they love, collaborate, find mentors, get involved, learn from failure, and believe in something bigger than themselves."},
-{q:"Which are characteristics of people with empathy?",pg:162,
- a:["Put themselves in other people's shoes and see the world from their perspective","Show care and concern about other people's feelings","Acknowledge how others feel instead of brushing off their concerns","Ask questions to clarify what others are experiencing","Imitate people's behavior to build a connection, such as matching eye contact","Stay with people during challenges instead of rushing to find solutions","Avoid judging and blaming people for their struggles","Give emotional support and reassurance"],
- o:["Rush to fix the problem so the conversation can end","Dismiss feelings that seem overblown"],
- why:"People with empathy can take another person's perspective and even feel the same emotions."},
-{q:"Which are healthy practices for self-compassion?",pg:168,
- a:["Treat yourself the way you would treat a close friend or sibling","Be mindful of negative self-talk","Remind yourself that your experiences are normal, human experiences"],
- o:["Criticize yourself harshly so you'll do better","Assume no one else has ever struggled the way you do"],
- why:"Self-compassion means kindness toward yourself, watching your self-talk, and remembering that everyone struggles."},
-{q:"Which are impacts that stress has on the cardiovascular system?",pg:186,
- a:["Fatty deposits and glucose build up on blood vessel walls over time, narrowing them","The heart must work harder to pump blood","Heart rate and blood pressure increase","Chronic wear and tear increases the risk of heart attack, stroke, and other cardiovascular diseases"],
- o:["Blood vessels permanently widen","Heart rate and blood pressure decrease"],
- why:"If stress is resolved, the body should relax and return to normal. Chronic stress causes lasting damage."},
-{q:"Which are examples of how stigma affects people with mental illness?",pg:228,
- a:["They deny they have a condition","They feel shame and embarrassment"],
- o:["They feel more comfortable seeking treatment","They talk openly about their condition"],
- why:"Stigma can lead people to deny their condition or feel ashamed and embarrassed, which keeps them from getting help."}
+{"q":"Which are impacts that stress has on the cardiovascular system?","pg":186,"a":["Heart rate and blood pressure increase","Chronic wear and tear increases the risk of heart attack, stroke, and other cardiovascular diseases","Fatty deposits and glucose build up on blood vessel walls over time, narrowing them","The heart must work harder to pump blood"],"o":["Blood vessels permanently widen","Heart rate and blood pressure decrease"],"why":"If stress is resolved, the body should relax and return to normal. Chronic stress causes lasting damage."},
+{"q":"Which are healthy, positive ways to accept and express your emotions?","pg":133,"a":["Documenting a positive moment","Crying","Sharing with friends, family, or a trusted adult","Doing an activity you enjoy","Finding a reason to laugh","Taking a walk or run","Taking a long bath or shower","Writing in a journal"],"o":["Lashing out at others","Bottling feelings up so no one sees them"],"why":"The book also lists reducing stress. Healthy expression lets feelings out without hurting yourself or others."},
+{"q":"Which are tendencies of teens who focus on finding meaning and purpose in life?","pg":145,"a":["Hold beliefs in causes or ideas bigger than themselves","Learn from failure, which teaches resilience and persistence","Find inspiring mentors, such as parents, teachers, and coaches","Spend time in the community through a part-time job, volunteering, or causes","Work with other people instead of competing against them","Do what they love instead of what they think others want them to do"],"o":["Avoid failure at all costs","Do whatever others expect of them"],"why":"Teens focused on purpose follow what they love, collaborate, find mentors, get involved, learn from failure, and believe in something bigger than themselves."},
+{"q":"Which describe a positive environment that can build self-esteem?","pg":125,"a":["Being supported for your successes","Being supported when situations don't go your way"],"o":["Being criticized for any shortcomings","Being held to impossibly high standards"],"why":"In a positive environment, people are supported both when they succeed and when things go wrong."},
+{"q":"Which are characteristics of a person who has a \"sense of balance\"?","pg":103,"a":["Feels comfortable spending time alone","Enjoys spending time with others"],"o":["Avoids being alone whenever possible","Avoids spending time with others"],"why":"A person with a sense of balance enjoys time with others and is also comfortable alone."},
+{"q":"Which are healthy practices for self-compassion?","pg":168,"a":["Treat yourself the way you would treat a close friend or sibling","Remind yourself that your experiences are normal, human experiences","Be mindful of negative self-talk"],"o":["Assume no one else has ever struggled the way you do","Criticize yourself harshly so you'll do better"],"why":"Self-compassion means kindness toward yourself, watching your self-talk, and remembering that everyone struggles."},
+{"q":"Which are examples of how stigma affects people with mental illness?","pg":228,"a":["They feel shame and embarrassment","They deny they have a condition"],"o":["They talk openly about their condition","They feel more comfortable seeking treatment"],"why":"Stigma can lead people to deny their condition or feel ashamed and embarrassed, which keeps them from getting help."},
+{"q":"Which are characteristics of people with empathy?","pg":162,"a":["Acknowledge how others feel instead of brushing off their concerns","Imitate people's behavior to build a connection, such as matching eye contact","Give emotional support and reassurance","Stay with people during challenges instead of rushing to find solutions","Avoid judging and blaming people for their struggles","Show care and concern about other people's feelings","Put themselves in other people's shoes and see the world from their perspective","Ask questions to clarify what others are experiencing"],"o":["Dismiss feelings that seem overblown","Rush to fix the problem so the conversation can end"],"why":"People with empathy can take another person's perspective and even feel the same emotions."},
+{"q":"Which describe a negative environment that can harm self-esteem?","pg":125,"a":["Being criticized for any shortcomings","Being held to impossibly high standards","Being blamed for failures and disappointments"],"o":["Being supported when situations don't go your way","Being supported for your successes"],"why":"Negative environments criticize shortcomings, blame people for failures, and set impossibly high standards."},
+{"q":"Which are benefits of happiness?","pg":143,"a":["Reduced risk of health conditions","Lower levels of stress and anxiety","Better mental and emotional health","Better health habits","Longer life","Faster recovery from health conditions","Stronger support system"],"o":["Never getting sick","Never feeling sadness again"],"why":"Happiness brings many health benefits, but it does not remove negative emotions or illness entirely."}
 ];
 
 const $=id=>document.getElementById(id);
@@ -234,6 +199,7 @@ const PARTS=[
 let S, cur=0;
 
 function newTest(){
+  pickTF();
   S={
     vocab:{order:null,page:0,missed:new Set(),done:0,finished:false},
     tf:{order:shuffle(TF.map((_,i)=>i)),ans:{}},
@@ -420,7 +386,7 @@ function drawResults(){
   s.append(box);
   const items=[];
   if(S.vocab.done===VOCAB.length)[...S.vocab.missed].forEach(i=>items.push(`<li><b>${esc(VOCAB[i][0])}</b>: ${esc(VOCAB[i][1])}</li>`));
-  TF.forEach((t,i)=>{if(S.tf.ans[i]===false)items.push(`<li><b>False:</b> ${esc(t.q)} ${esc(t.why)}</li>`)});
+  TF.forEach((t,i)=>{if(S.tf.ans[i]===false)items.push(`<li><b>${t.a?'True':'False'}:</b> ${esc(t.q)} ${esc(t.why)}</li>`)});
   MC.forEach((m,i)=>{if(S.mc.ans[i]===false)items.push(`<li>${esc(m.q)} <b>${esc(m.a)}</b> <span class="pg">(pg. ${m.pg})</span></li>`)});
   MULTI.forEach((m,i)=>{if(S.multi.ans[i]===false)items.push(`<li>${esc(m.q)} <b>${m.a.map(esc).join('; ')}</b> <span class="pg">(pg. ${m.pg})</span></li>`)});
   if(items.length){const h=document.createElement('p');h.className='label';h.textContent='Review these';s.append(h);const ul=document.createElement('ul');ul.className='missed';ul.innerHTML=items.join('');s.append(ul)}
@@ -429,6 +395,7 @@ function drawResults(){
   const again=document.createElement('button');again.className='btn';again.textContent='Retake with new shuffle';again.onclick=newTest;r.append(again);
   s.append(r);
 }
+$('reshuffle').onclick=()=>{newTest();const n=$('shufnote');n.textContent='Shuffled. New order loaded.';setTimeout(()=>n.textContent='Starts over with a new random order.',2500)};
 newTest();
 </script>
 
