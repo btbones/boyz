@@ -52,20 +52,21 @@ h1 .pin{display:inline-block;width:.62em;height:.62em;border-radius:50% 50% 50% 
 .bar{height:6px;background:var(--chip);border-radius:3px;overflow:hidden}
 .bar span{display:block;height:100%;background:var(--pin);transition:width .25s}
 
-.plate{background:var(--surface);border:1px solid var(--line);border-radius:18px;min-height:190px;display:flex;align-items:center;justify-content:center;padding:18px;text-align:center}
-.bigflag{font-family:var(--flag);font-size:clamp(7rem,32vw,9.5rem);line-height:1}
+.stage{position:sticky;top:0;z-index:2;background:var(--bg);display:flex;flex-direction:column;gap:8px;padding-block:6px}
+.plate{background:var(--surface);border:1px solid var(--line);border-radius:18px;min-height:140px;display:flex;align-items:center;justify-content:center;padding:18px;text-align:center}
+.bigflag{font-family:var(--flag);font-size:clamp(5rem,22vw,7rem);line-height:1}
 .bigname{font-family:var(--display);font-weight:800;font-size:clamp(1.6rem,7vw,2.4rem);line-height:1.1;text-wrap:balance}
 .prompt{font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:6px}
 
-.answers{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.ans{position:relative;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:700 1rem var(--body);padding:14px 12px 14px 36px;border-radius:14px;cursor:pointer;text-align:left;min-height:60px;min-width:0;overflow-wrap:anywhere}
-.ans .k{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:.75rem;color:var(--muted);font-variant-numeric:tabular-nums}
-.answers.flags .ans{text-align:center;padding:10px;font-family:var(--flag);font-size:clamp(3.4rem,15vw,4.4rem);line-height:1;font-weight:400;min-height:96px}
+.answers{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
+.ans{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:700 .92rem var(--body);padding:8px 10px;border-radius:10px;cursor:pointer;text-align:left;min-height:44px;min-width:0;overflow-wrap:anywhere}
+.answers.flags{grid-template-columns:repeat(auto-fill,minmax(76px,1fr))}
+.answers.flags .ans{text-align:center;padding:6px;font-family:var(--flag);font-size:2.6rem;line-height:1;font-weight:400;min-height:64px}
 .ans:hover:not(:disabled){border-color:var(--ink)}
 .ans.right{border-color:var(--good);background:var(--good-bg)}
 .ans.wrong{border-color:var(--bad);background:var(--bad-bg)}
 .ans:disabled{cursor:default}
-.feedback{min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.feedback{min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .feedback p{margin:0;font-weight:700}
 .feedback .ok{color:var(--good)} .feedback .no{color:var(--bad)}
 
@@ -131,9 +132,11 @@ h1 .pin{display:inline-block;width:.62em;height:.62em;border-radius:50% 50% 50% 
       <div class="wrap" style="gap:14px">
         <div class="rail"><span>Question <b id="qnum">1</b> / <b id="qtot">25</b></span><span>Score <b id="sc">0</b> · Streak <b id="st">0</b></span><button class="chip" id="quit">End round</button></div>
         <div class="bar"><span id="prog" style="width:0%"></span></div>
-        <div class="plate" id="plate"></div>
+        <div class="stage">
+          <div class="plate" id="plate"></div>
+          <div class="feedback" id="feedback"></div>
+        </div>
         <div class="answers" id="answers"></div>
-        <div class="feedback" id="feedback"></div>
       </div>
     </div>
 
@@ -142,7 +145,7 @@ h1 .pin{display:inline-block;width:.62em;height:.62em;border-radius:50% 50% 50% 
 
   <section id="view-study" class="study" hidden></section>
 
-  <p class="foot">Coverage list compiled from GeoGuessr community trackers as of October 2026. "Rare" places have only landmark, trekker or small patches of coverage, so they show up far less often in normal games. Keys 1–4 answer, Enter goes to the next flag.</p>
+  <p class="foot">Coverage list compiled from GeoGuessr community trackers as of October 2026. "Rare" places have only landmark, trekker or small patches of coverage, so they show up far less often in normal games. Every flag in your selected regions is an option, and ones you get right drop out for the rest of the round. Enter goes to the next flag.</p>
 </div>
 
 <script>
@@ -189,13 +192,6 @@ const DATA = [
 
 function flagOf(cc){return [...cc].map(c=>String.fromCodePoint(127397+c.charCodeAt(0))).join("")}
 
-// Flags people commonly mix up — used for tricky distractors.
-const LOOKALIKE = [
- ["NL","LU","RU","HR","SK","SI","RS","PY"],["RO","AD"],["IE","IT","MX","HU","BG"],["NO","IS","FO","DK","AX","FI","SE"],
- ["AU","NZ"],["SN","ML","GH","BO","LT"],["EC","CO"],["JO","PS","AE"],["MC","PL","SG","ID"],["AT","LV","LB"],
- ["US","MY","PR","LR"],["CR","TH"],["AR","UY","GT","SM"],["KR","JP"],["EE","BW"],["IN","NE","IE"],["QA","BH"],["TN","TR"],
- ["SI","SK","RU"],["BM","GB","AU","NZ"],["CW","VI"],["KH","LA"],["CL","TX","PR"],["NG","PK"]
-];
 const IDENTICAL = new Set(["MC|ID","ID|MC"]); // never offer both at once
 
 const state = {mode:"flag2name", regions:new Set(["Europe","Americas","Asia","Africa","Oceania"]), inc:new Set(["t"]), len:"25"};
@@ -228,41 +224,30 @@ $("#settings").addEventListener("click",e=>{
   syncSettings();
 });
 
-function distractors(target, p){
-  const out=[]; const used=new Set([target.code]);
-  const ok=d=>!used.has(d.code)&&!IDENTICAL.has(target.code+"|"+d.code)&&!out.some(o=>IDENTICAL.has(o.code+"|"+d.code));
-  const universe = p.length>=8?p:DATA;
-  const look=shuffle(LOOKALIKE.filter(g=>g.includes(target.code)).flat().map(c=>DATA.find(d=>d.code===c)).filter(Boolean).filter(d=>universe.includes(d)||DATA.includes(d)));
-  for(const d of look){ if(out.length>=2) break; if(ok(d)){out.push(d);used.add(d.code)} }
-  const same=shuffle(universe.filter(d=>d.region===target.region));
-  for(const d of same){ if(out.length>=3) break; if(ok(d)){out.push(d);used.add(d.code)} }
-  const any=shuffle([...universe]);
-  for(const d of any){ if(out.length>=3) break; if(ok(d)){out.push(d);used.add(d.code)} }
-  return out;
-}
-
 function startRound(list){
   const p=pool();
   let qs = list ? shuffle([...list]) : shuffle([...p]);
   if(!list && state.len!=="all") qs=qs.slice(0,+state.len);
-  round={qs,i:0,score:0,streak:0,bestStreak:0,misses:[],pool:p,answered:false,retry:!!list};
+  round={qs,i:0,score:0,streak:0,bestStreak:0,misses:[],pool:p,solved:new Set(),answered:false,retry:!!list};
   $("#settings").hidden=true; $("#result").hidden=true; $("#game").hidden=false;
   $("#qtot").textContent=qs.length; show();
 }
 function show(){
   const q=round.qs[round.i]; round.answered=false;
-  const opts=shuffle([q,...distractors(q,round.pool)]); round.opts=opts;
+  // Every unsolved flag in the pool, A–Z; an identical-looking flag is left out so the question stays fair
+  const opts=round.pool.filter(d=>!round.solved.has(d.code)&&!IDENTICAL.has(q.code+"|"+d.code))
+    .sort((a,b)=>a.name.localeCompare(b.name)); round.opts=opts;
   $("#qnum").textContent=round.i+1; $("#sc").textContent=round.score; $("#st").textContent=round.streak;
   $("#prog").style.width=(round.i/round.qs.length*100)+"%";
   const plate=$("#plate"), ans=$("#answers"); ans.innerHTML=""; $("#feedback").innerHTML="";
   if(state.mode==="flag2name"){
     plate.innerHTML=`<div><div class="prompt">Which flag is this?</div><div class="bigflag" role="img" aria-label="Flag to identify">${q.flag}</div></div>`;
     ans.className="answers";
-    opts.forEach((o,k)=>{const b=document.createElement("button");b.className="ans";b.id="ans-"+k;b.innerHTML=`<span class="k">${k+1}</span>${o.name}`;b.onclick=()=>answer(k);ans.appendChild(b)});
+    opts.forEach((o,k)=>{const b=document.createElement("button");b.className="ans";b.id="ans-"+k;b.textContent=o.name;b.onclick=()=>answer(k);ans.appendChild(b)});
   } else {
     plate.innerHTML=`<div><div class="prompt">Find the flag of</div><div class="bigname">${q.name}</div></div>`;
     ans.className="answers flags";
-    opts.forEach((o,k)=>{const b=document.createElement("button");b.className="ans";b.id="ans-"+k;b.setAttribute("aria-label","Option "+(k+1));b.innerHTML=`<span class="k" style="font-family:var(--body)">${k+1}</span>${o.flag}`;b.onclick=()=>answer(k);ans.appendChild(b)});
+    opts.forEach((o,k)=>{const b=document.createElement("button");b.className="ans";b.id="ans-"+k;b.setAttribute("aria-label","Option "+(k+1));b.textContent=o.flag;b.onclick=()=>answer(k);ans.appendChild(b)});
   }
 }
 function answer(k){
@@ -271,7 +256,7 @@ function answer(k){
   const btns=[...document.querySelectorAll("#answers .ans")];
   btns.forEach((b,i)=>{b.disabled=true; if(round.opts[i].code===q.code) b.classList.add("right")});
   if(!right) btns[k].classList.add("wrong");
-  if(right){round.score++;round.streak++;round.bestStreak=Math.max(round.bestStreak,round.streak)} else {round.streak=0;round.misses.push(q)}
+  if(right){round.solved.add(q.code);round.score++;round.streak++;round.bestStreak=Math.max(round.bestStreak,round.streak)} else {round.streak=0;round.misses.push(q)}
   $("#sc").textContent=round.score; $("#st").textContent=round.streak;
   const fb=$("#feedback");
   const msg = right ? `<p class="ok">Correct — ${q.flag ? `<span style="font-family:var(--flag)">${q.flag}</span> ` : ""}${q.name}</p>`
@@ -305,8 +290,7 @@ $("#quit").onclick=()=>{clearTimeout(round&&round.timer); if(round && round.i>0)
 
 document.addEventListener("keydown",e=>{
   if($("#game").hidden||!round) return;
-  if(/^[1-4]$/.test(e.key)&&!round.answered){answer(+e.key-1);e.preventDefault()}
-  else if(e.key==="Enter"&&round.answered){next();e.preventDefault()}
+  if(e.key==="Enter"&&round.answered){next();e.preventDefault()}
 });
 
 // Study view
