@@ -2,6 +2,10 @@
 
 Access at: https://btbones.github.io/boyz/
 
+The home page (`index.html`) is a chooser that links to:
+- **Health Study Hub** (`health.html`)
+- **Coverage Flag Quiz** (a public Claude artifact: https://claude.ai/artifact/Nrhs5D55LXoRtAa1aP3RPy)
+
 Health Hub
 The vocab words came from these Quizlet sets:
 - **Chapter 6 (Stress), 27 terms:** [Ch 6 health Flashcards](https://quizlet.com/1007490769/ch-6-health-flash-cards/)
