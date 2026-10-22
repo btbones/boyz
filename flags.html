@@ -1,0 +1,326 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Coverage Flag Quiz</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=Noto+Color+Emoji&display=swap">
+<style>
+/* Layout: one centered column like a field card — settings strip, big flag "plate", answer grid, score rail. */
+:root{
+  --bg:#EDF0EA; --surface:#FBFCF8; --ink:#16211F; --muted:#5C6A66; --line:#D3DAD2;
+  --pin:#F2BE2E; --pin-ink:#2A2100; --good:#23824F; --good-bg:#DCEFE2; --bad:#C23B33; --bad-bg:#F6DEDB;
+  --chip:#E2E7DF;
+  --display:"Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --flag:"Apple Color Emoji","Noto Color Emoji","Segoe UI Emoji",sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0F1716; --surface:#172220; --ink:#E6EEEA; --muted:#93A39E; --line:#2A3835;
+  --pin:#F2BE2E; --pin-ink:#2A2100; --good:#5CCB8C; --good-bg:#16352A; --bad:#F07A70; --bad-bg:#3B1E1C; --chip:#22302D; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0F1716; --surface:#172220; --ink:#E6EEEA; --muted:#93A39E; --line:#2A3835;
+  --pin:#F2BE2E; --pin-ink:#2A2100; --good:#5CCB8C; --good-bg:#16352A; --bad:#F07A70; --bad-bg:#3B1E1C; --chip:#22302D; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;
+  padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:620px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(1.7rem,6vw,2.3rem);line-height:1;margin:0;letter-spacing:-.02em;text-wrap:balance}
+h1 .pin{display:inline-block;width:.62em;height:.62em;border-radius:50% 50% 50% 0;background:var(--pin);transform:rotate(-45deg) translateY(-.08em);margin-right:.22em;border:3px solid var(--ink)}
+.sub{color:var(--muted);font-size:.9rem;margin:6px 0 0}
+.tabs{display:flex;gap:4px;background:var(--chip);padding:4px;border-radius:999px}
+.tabs button{border:0;background:transparent;color:var(--ink);font:700 .85rem var(--body);padding:7px 14px;border-radius:999px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+
+.settings{display:flex;flex-direction:column;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;width:100%}
+.chip{border:1px solid var(--line);background:var(--bg);color:var(--ink);font:400 .88rem var(--body);padding:6px 11px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip:focus-visible,.ans:focus-visible,.btn:focus-visible,.tabs button:focus-visible{outline:3px solid var(--pin);outline-offset:2px}
+.poolnote{font-size:.85rem;color:var(--muted)}
+.poolnote b{color:var(--ink);font-variant-numeric:tabular-nums}
+
+.btn{border:0;font:700 1rem var(--body);padding:12px 18px;border-radius:12px;cursor:pointer}
+.btn.primary{background:var(--pin);color:var(--pin-ink)}
+.btn.ghost{background:var(--chip);color:var(--ink)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.rail{display:flex;justify-content:space-between;align-items:center;font-variant-numeric:tabular-nums;font-size:.9rem;color:var(--muted);gap:10px;flex-wrap:wrap}
+.rail b{color:var(--ink)}
+.bar{height:6px;background:var(--chip);border-radius:3px;overflow:hidden}
+.bar span{display:block;height:100%;background:var(--pin);transition:width .25s}
+
+.plate{background:var(--surface);border:1px solid var(--line);border-radius:18px;min-height:190px;display:flex;align-items:center;justify-content:center;padding:18px;text-align:center}
+.bigflag{font-family:var(--flag);font-size:clamp(7rem,32vw,9.5rem);line-height:1}
+.bigname{font-family:var(--display);font-weight:800;font-size:clamp(1.6rem,7vw,2.4rem);line-height:1.1;text-wrap:balance}
+.prompt{font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:6px}
+
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ans{position:relative;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:700 1rem var(--body);padding:14px 12px 14px 36px;border-radius:14px;cursor:pointer;text-align:left;min-height:60px;min-width:0;overflow-wrap:anywhere}
+.ans .k{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:.75rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.answers.flags .ans{text-align:center;padding:10px;font-family:var(--flag);font-size:clamp(3.4rem,15vw,4.4rem);line-height:1;font-weight:400;min-height:96px}
+.ans:hover:not(:disabled){border-color:var(--ink)}
+.ans.right{border-color:var(--good);background:var(--good-bg)}
+.ans.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.ans:disabled{cursor:default}
+.feedback{min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.feedback p{margin:0;font-weight:700}
+.feedback .ok{color:var(--good)} .feedback .no{color:var(--bad)}
+
+.result{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:14px}
+.score{font-family:var(--display);font-weight:800;font-size:3.4rem;line-height:1;font-variant-numeric:tabular-nums}
+.misses{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.miss,.card{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:10px;padding:8px 10px;min-width:0}
+.miss span:first-child,.card .f{font-family:var(--flag);font-size:2rem;line-height:1;flex:none}
+.miss span:last-child,.card .n{font-size:.88rem;min-width:0;overflow-wrap:anywhere}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap}
+
+.study{display:flex;flex-direction:column;gap:16px}
+.study h2{font-family:var(--display);font-weight:800;font-size:1.25rem;margin:0 0 8px}
+.study .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+.card .tag{font-size:.68rem;color:var(--muted);display:block;text-transform:uppercase;letter-spacing:.06em}
+.foot{font-size:.8rem;color:var(--muted);max-width:60ch}
+.up{align-self:flex-start;text-decoration:none}
+@media (prefers-reduced-motion: reduce){ .bar span{transition:none} }
+</style>
+
+<div class="wrap">
+  <a class="chip up" href="./">← All study tools</a>
+  <header>
+    <div>
+      <h1><span class="pin" aria-hidden="true"></span>Coverage Flag Quiz</h1>
+      <p class="sub">Flags of every country and territory with official Street View coverage in GeoGuessr.</p>
+    </div>
+    <div class="tabs" role="group" aria-label="View">
+      <button id="tab-quiz" aria-pressed="true">Quiz</button>
+      <button id="tab-study" aria-pressed="false">Study</button>
+    </div>
+  </header>
+
+  <section id="view-quiz" class="wrap" style="gap:18px">
+    <div class="settings" id="settings">
+      <div class="row"><span class="label">Mode</span>
+        <button class="chip" data-mode="flag2name" aria-pressed="true">Flag → name</button>
+        <button class="chip" data-mode="name2flag" aria-pressed="false">Name → flag</button>
+      </div>
+      <div class="row"><span class="label">Regions</span>
+        <button class="chip" data-region="Europe" aria-pressed="true">Europe</button>
+        <button class="chip" data-region="Americas" aria-pressed="true">Americas</button>
+        <button class="chip" data-region="Asia" aria-pressed="true">Asia &amp; Middle East</button>
+        <button class="chip" data-region="Africa" aria-pressed="true">Africa</button>
+        <button class="chip" data-region="Oceania" aria-pressed="true">Oceania</button>
+      </div>
+      <div class="row"><span class="label">Include</span>
+        <button class="chip" data-inc="t" aria-pressed="true">Territories</button>
+        <button class="chip" data-inc="r" aria-pressed="false">Rare / limited coverage</button>
+      </div>
+      <div class="row"><span class="label">Round length</span>
+        <button class="chip" data-len="10" aria-pressed="false">10</button>
+        <button class="chip" data-len="25" aria-pressed="true">25</button>
+        <button class="chip" data-len="all" aria-pressed="false">All</button>
+      </div>
+      <div class="row" style="justify-content:space-between">
+        <span class="poolnote"><b id="poolcount">0</b> flags in pool<span id="best"></span></span>
+        <button class="btn primary" id="start">Start round</button>
+      </div>
+    </div>
+
+    <div id="game" hidden>
+      <div class="wrap" style="gap:14px">
+        <div class="rail"><span>Question <b id="qnum">1</b> / <b id="qtot">25</b></span><span>Score <b id="sc">0</b> · Streak <b id="st">0</b></span><button class="chip" id="quit">End round</button></div>
+        <div class="bar"><span id="prog" style="width:0%"></span></div>
+        <div class="plate" id="plate"></div>
+        <div class="answers" id="answers"></div>
+        <div class="feedback" id="feedback"></div>
+      </div>
+    </div>
+
+    <div class="result" id="result" hidden></div>
+  </section>
+
+  <section id="view-study" class="study" hidden></section>
+
+  <p class="foot">Coverage list compiled from GeoGuessr community trackers as of October 2026. "Rare" places have only landmark, trekker or small patches of coverage, so they show up far less often in normal games. Keys 1–4 answer, Enter goes to the next flag.</p>
+</div>
+
+<script>
+// [code, name, region, type]  type: c = country, t = territory, r = rare/limited
+const DATA = [
+ ["AL","Albania","Europe","c"],["AD","Andorra","Europe","c"],["AT","Austria","Europe","c"],["BE","Belgium","Europe","c"],
+ ["BA","Bosnia and Herzegovina","Europe","c"],["BG","Bulgaria","Europe","c"],["HR","Croatia","Europe","c"],["CY","Cyprus","Europe","c"],
+ ["CZ","Czechia","Europe","c"],["DK","Denmark","Europe","c"],["EE","Estonia","Europe","c"],["FI","Finland","Europe","c"],
+ ["FR","France","Europe","c"],["DE","Germany","Europe","c"],["GR","Greece","Europe","c"],["HU","Hungary","Europe","c"],
+ ["IS","Iceland","Europe","c"],["IE","Ireland","Europe","c"],["IT","Italy","Europe","c"],["LV","Latvia","Europe","c"],
+ ["LI","Liechtenstein","Europe","c"],["LT","Lithuania","Europe","c"],["LU","Luxembourg","Europe","c"],["MT","Malta","Europe","c"],
+ ["MC","Monaco","Europe","c"],["ME","Montenegro","Europe","c"],["NL","Netherlands","Europe","c"],["MK","North Macedonia","Europe","c"],
+ ["NO","Norway","Europe","c"],["PL","Poland","Europe","c"],["PT","Portugal","Europe","c"],["RO","Romania","Europe","c"],
+ ["RU","Russia","Europe","c"],["SM","San Marino","Europe","c"],["RS","Serbia","Europe","c"],["SK","Slovakia","Europe","c"],
+ ["SI","Slovenia","Europe","c"],["ES","Spain","Europe","c"],["SE","Sweden","Europe","c"],["CH","Switzerland","Europe","c"],
+ ["TR","Turkey","Europe","c"],["UA","Ukraine","Europe","c"],["GB","United Kingdom","Europe","c"],
+ ["FO","Faroe Islands","Europe","t"],["GI","Gibraltar","Europe","t"],["IM","Isle of Man","Europe","t"],["JE","Jersey","Europe","t"],["AX","Åland Islands","Europe","t"],
+ ["BY","Belarus","Europe","r"],["XK","Kosovo","Europe","r"],
+
+ ["AR","Argentina","Americas","c"],["BO","Bolivia","Americas","c"],["BR","Brazil","Americas","c"],["CA","Canada","Americas","c"],
+ ["CL","Chile","Americas","c"],["CO","Colombia","Americas","c"],["CR","Costa Rica","Americas","c"],["DO","Dominican Republic","Americas","c"],
+ ["EC","Ecuador","Americas","c"],["GT","Guatemala","Americas","c"],["MX","Mexico","Americas","c"],["PA","Panama","Americas","c"],
+ ["PY","Paraguay","Americas","c"],["PE","Peru","Americas","c"],["US","United States","Americas","c"],["UY","Uruguay","Americas","c"],
+ ["BM","Bermuda","Americas","t"],["CW","Curaçao","Americas","t"],["GL","Greenland","Americas","t"],["PR","Puerto Rico","Americas","t"],["VI","U.S. Virgin Islands","Americas","t"],
+
+ ["BD","Bangladesh","Asia","c"],["BT","Bhutan","Asia","c"],["KH","Cambodia","Asia","c"],["IN","India","Asia","c"],
+ ["ID","Indonesia","Asia","c"],["IL","Israel","Asia","c"],["JP","Japan","Asia","c"],["JO","Jordan","Asia","c"],
+ ["KG","Kyrgyzstan","Asia","c"],["LA","Laos","Asia","c"],["LB","Lebanon","Asia","c"],["MY","Malaysia","Asia","c"],
+ ["MN","Mongolia","Asia","c"],["OM","Oman","Asia","c"],["PS","Palestine","Asia","c"],["PH","Philippines","Asia","c"],
+ ["QA","Qatar","Asia","c"],["SG","Singapore","Asia","c"],["KR","South Korea","Asia","c"],["LK","Sri Lanka","Asia","c"],
+ ["TW","Taiwan","Asia","c"],["TH","Thailand","Asia","c"],["AE","United Arab Emirates","Asia","c"],
+ ["HK","Hong Kong","Asia","t"],["CX","Christmas Island","Asia","t"],
+ ["CN","China","Asia","r"],["KZ","Kazakhstan","Asia","r"],["NP","Nepal","Asia","r"],["PK","Pakistan","Asia","r"],["VN","Vietnam","Asia","r"],["IQ","Iraq","Asia","r"],
+
+ ["BW","Botswana","Africa","c"],["SZ","Eswatini","Africa","c"],["GH","Ghana","Africa","c"],["KE","Kenya","Africa","c"],
+ ["LS","Lesotho","Africa","c"],["MG","Madagascar","Africa","c"],["NA","Namibia","Africa","c"],["NG","Nigeria","Africa","c"],
+ ["RW","Rwanda","Africa","c"],["SN","Senegal","Africa","c"],["ZA","South Africa","Africa","c"],["TN","Tunisia","Africa","c"],["UG","Uganda","Africa","c"],
+ ["EG","Egypt","Africa","r"],["ML","Mali","Africa","r"],["TZ","Tanzania","Africa","r"],["ST","São Tomé and Príncipe","Africa","r"],
+
+ ["AU","Australia","Oceania","c"],["NZ","New Zealand","Oceania","c"],
+ ["AS","American Samoa","Oceania","t"],["GU","Guam","Oceania","t"],["MP","Northern Mariana Islands","Oceania","t"],
+ ["VU","Vanuatu","Oceania","r"]
+].map(([code,name,region,type])=>({code,name,region,type,flag:flagOf(code)}));
+
+function flagOf(cc){return [...cc].map(c=>String.fromCodePoint(127397+c.charCodeAt(0))).join("")}
+
+// Flags people commonly mix up — used for tricky distractors.
+const LOOKALIKE = [
+ ["NL","LU","RU","HR","SK","SI","RS","PY"],["RO","AD"],["IE","IT","MX","HU","BG"],["NO","IS","FO","DK","AX","FI","SE"],
+ ["AU","NZ"],["SN","ML","GH","BO","LT"],["EC","CO"],["JO","PS","AE"],["MC","PL","SG","ID"],["AT","LV","LB"],
+ ["US","MY","PR","LR"],["CR","TH"],["AR","UY","GT","SM"],["KR","JP"],["EE","BW"],["IN","NE","IE"],["QA","BH"],["TN","TR"],
+ ["SI","SK","RU"],["BM","GB","AU","NZ"],["CW","VI"],["KH","LA"],["CL","TX","PR"],["NG","PK"]
+];
+const IDENTICAL = new Set(["MC|ID","ID|MC"]); // never offer both at once
+
+const state = {mode:"flag2name", regions:new Set(["Europe","Americas","Asia","Africa","Oceania"]), inc:new Set(["t"]), len:"25"};
+let round=null;
+
+const $=s=>document.querySelector(s);
+const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const saved=store.get("cfq-settings");
+if(saved){try{state.mode=saved.mode||state.mode;state.regions=new Set(saved.regions||[...state.regions]);state.inc=new Set(saved.inc||[...state.inc]);state.len=saved.len||state.len}catch(e){}}
+
+function pool(){return DATA.filter(d=>state.regions.has(d.region)&&(d.type==="c"||state.inc.has(d.type)))}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function bestKey(){return "cfq-best-"+state.mode}
+
+function syncSettings(){
+  document.querySelectorAll("[data-mode]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.mode===state.mode));
+  document.querySelectorAll("[data-region]").forEach(b=>b.setAttribute("aria-pressed",state.regions.has(b.dataset.region)));
+  document.querySelectorAll("[data-inc]").forEach(b=>b.setAttribute("aria-pressed",state.inc.has(b.dataset.inc)));
+  document.querySelectorAll("[data-len]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.len===state.len));
+  const n=pool().length; $("#poolcount").textContent=n; $("#start").disabled=n<4;
+  const best=store.get(bestKey()); $("#best").textContent=best!=null?` · best ${best}% in this mode`:"";
+  store.set("cfq-settings",{mode:state.mode,regions:[...state.regions],inc:[...state.inc],len:state.len});
+}
+$("#settings").addEventListener("click",e=>{
+  const b=e.target.closest(".chip"); if(!b) return;
+  if(b.dataset.mode) state.mode=b.dataset.mode;
+  if(b.dataset.region){const r=b.dataset.region; if(state.regions.has(r)){ if(state.regions.size>1) state.regions.delete(r)} else state.regions.add(r)}
+  if(b.dataset.inc){const t=b.dataset.inc; state.inc.has(t)?state.inc.delete(t):state.inc.add(t)}
+  if(b.dataset.len) state.len=b.dataset.len;
+  syncSettings();
+});
+
+function distractors(target, p){
+  const out=[]; const used=new Set([target.code]);
+  const ok=d=>!used.has(d.code)&&!IDENTICAL.has(target.code+"|"+d.code)&&!out.some(o=>IDENTICAL.has(o.code+"|"+d.code));
+  const universe = p.length>=8?p:DATA;
+  const look=shuffle(LOOKALIKE.filter(g=>g.includes(target.code)).flat().map(c=>DATA.find(d=>d.code===c)).filter(Boolean).filter(d=>universe.includes(d)||DATA.includes(d)));
+  for(const d of look){ if(out.length>=2) break; if(ok(d)){out.push(d);used.add(d.code)} }
+  const same=shuffle(universe.filter(d=>d.region===target.region));
+  for(const d of same){ if(out.length>=3) break; if(ok(d)){out.push(d);used.add(d.code)} }
+  const any=shuffle([...universe]);
+  for(const d of any){ if(out.length>=3) break; if(ok(d)){out.push(d);used.add(d.code)} }
+  return out;
+}
+
+function startRound(list){
+  const p=pool();
+  let qs = list ? shuffle([...list]) : shuffle([...p]);
+  if(!list && state.len!=="all") qs=qs.slice(0,+state.len);
+  round={qs,i:0,score:0,streak:0,bestStreak:0,misses:[],pool:p,answered:false,retry:!!list};
+  $("#settings").hidden=true; $("#result").hidden=true; $("#game").hidden=false;
+  $("#qtot").textContent=qs.length; show();
+}
+function show(){
+  const q=round.qs[round.i]; round.answered=false;
+  const opts=shuffle([q,...distractors(q,round.pool)]); round.opts=opts;
+  $("#qnum").textContent=round.i+1; $("#sc").textContent=round.score; $("#st").textContent=round.streak;
+  $("#prog").style.width=(round.i/round.qs.length*100)+"%";
+  const plate=$("#plate"), ans=$("#answers"); ans.innerHTML=""; $("#feedback").innerHTML="";
+  if(state.mode==="flag2name"){
+    plate.innerHTML=`<div><div class="prompt">Which flag is this?</div><div class="bigflag" role="img" aria-label="Flag to identify">${q.flag}</div></div>`;
+    ans.className="answers";
+    opts.forEach((o,k)=>{const b=document.createElement("button");b.className="ans";b.id="ans-"+k;b.innerHTML=`<span class="k">${k+1}</span>${o.name}`;b.onclick=()=>answer(k);ans.appendChild(b)});
+  } else {
+    plate.innerHTML=`<div><div class="prompt">Find the flag of</div><div class="bigname">${q.name}</div></div>`;
+    ans.className="answers flags";
+    opts.forEach((o,k)=>{const b=document.createElement("button");b.className="ans";b.id="ans-"+k;b.setAttribute("aria-label","Option "+(k+1));b.innerHTML=`<span class="k" style="font-family:var(--body)">${k+1}</span>${o.flag}`;b.onclick=()=>answer(k);ans.appendChild(b)});
+  }
+}
+function answer(k){
+  if(round.answered) return; round.answered=true;
+  const q=round.qs[round.i], pick=round.opts[k], right=pick.code===q.code;
+  const btns=[...document.querySelectorAll("#answers .ans")];
+  btns.forEach((b,i)=>{b.disabled=true; if(round.opts[i].code===q.code) b.classList.add("right")});
+  if(!right) btns[k].classList.add("wrong");
+  if(right){round.score++;round.streak++;round.bestStreak=Math.max(round.bestStreak,round.streak)} else {round.streak=0;round.misses.push(q)}
+  $("#sc").textContent=round.score; $("#st").textContent=round.streak;
+  const fb=$("#feedback");
+  const msg = right ? `<p class="ok">Correct — ${q.flag ? `<span style="font-family:var(--flag)">${q.flag}</span> ` : ""}${q.name}</p>`
+    : `<p class="no">That was ${pick.name}. Answer: <span style="font-family:var(--flag)">${q.flag}</span> ${q.name}</p>`;
+  fb.innerHTML = msg + `<button class="btn primary" id="next">${round.i+1<round.qs.length?"Next flag":"See results"}</button>`;
+  $("#next").onclick=next; $("#next").focus({preventScroll:true});
+  if(right){ round.timer=setTimeout(next,900) }
+}
+function next(){
+  clearTimeout(round.timer); if(!round.answered) return;
+  round.i++; if(round.i>=round.qs.length) return finish(); show();
+}
+function finish(){
+  $("#prog").style.width="100%";
+  const pct=Math.round(round.score/round.qs.length*100);
+  if(!round.retry){const best=store.get(bestKey()); if(best==null||pct>best) store.set(bestKey(),pct)}
+  $("#game").hidden=true; const r=$("#result"); r.hidden=false;
+  const verdict = pct===100?"Perfect round. No flag got past you.":pct>=80?"Strong. A few to tidy up.":pct>=50?"Getting there. Drill the misses below.":"Tough set. Try Study mode, then retry your misses.";
+  r.innerHTML=`<div class="prompt">Round complete</div>
+    <div class="score">${round.score}/${round.qs.length} <span style="font-size:1.4rem;color:var(--muted)">${pct}%</span></div>
+    <p style="margin:0">${verdict} Best streak: <b>${round.bestStreak}</b>.</p>
+    ${round.misses.length?`<div><div class="label" style="margin-bottom:8px">Missed (${round.misses.length})</div><div class="misses">${round.misses.map(m=>`<div class="miss"><span>${m.flag}</span><span>${m.name}</span></div>`).join("")}</div></div>`:""}
+    <div class="btnrow">${round.misses.length?`<button class="btn primary" id="retry">Retry misses</button>`:""}<button class="btn ${round.misses.length?"ghost":"primary"}" id="again">New round</button><button class="btn ghost" id="change">Change settings</button></div>`;
+  const misses=[...round.misses];
+  if($("#retry")) $("#retry").onclick=()=>startRound(misses);
+  $("#again").onclick=()=>startRound();
+  $("#change").onclick=()=>{r.hidden=true;$("#settings").hidden=false;syncSettings()};
+}
+$("#start").onclick=()=>startRound();
+$("#quit").onclick=()=>{clearTimeout(round&&round.timer); if(round && round.i>0){round.qs=round.qs.slice(0,round.i+ (round.answered?1:0)); finish()} else {$("#game").hidden=true;$("#settings").hidden=false}};
+
+document.addEventListener("keydown",e=>{
+  if($("#game").hidden||!round) return;
+  if(/^[1-4]$/.test(e.key)&&!round.answered){answer(+e.key-1);e.preventDefault()}
+  else if(e.key==="Enter"&&round.answered){next();e.preventDefault()}
+});
+
+// Study view
+function renderStudy(){
+  const order=["Europe","Americas","Asia","Africa","Oceania"], labels={Asia:"Asia & Middle East"}, tag={t:"Territory",r:"Rare coverage",c:""};
+  $("#view-study").innerHTML=order.map(r=>{const items=DATA.filter(d=>d.region===r).sort((a,b)=>a.name.localeCompare(b.name));
+    return `<div><h2>${labels[r]||r} <span style="color:var(--muted);font-weight:600;font-size:.9rem">${items.length}</span></h2><div class="grid">${items.map(d=>`<div class="card"><span class="f">${d.flag}</span><span class="n">${d.name}${tag[d.type]?`<span class="tag">${tag[d.type]}</span>`:""}</span></div>`).join("")}</div></div>`}).join("");
+}
+function setView(v){
+  $("#tab-quiz").setAttribute("aria-pressed",v==="quiz"); $("#tab-study").setAttribute("aria-pressed",v==="study");
+  $("#view-quiz").hidden=v!=="quiz"; $("#view-study").hidden=v!=="study";
+}
+$("#tab-quiz").onclick=()=>setView("quiz"); $("#tab-study").onclick=()=>setView("study");
+renderStudy(); syncSettings();
+</script>
+
+</body></html>
