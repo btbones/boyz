@@ -24,7 +24,7 @@
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;
   padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px));padding-block:20px 40px}
-.wrap{max-width:620px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.wrap{width:100%;max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
 header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
 h1{font-family:var(--display);font-weight:800;font-size:clamp(1.7rem,6vw,2.3rem);line-height:1;margin:0;letter-spacing:-.02em;text-wrap:balance}
 h1 .pin{display:inline-block;width:.62em;height:.62em;border-radius:50% 50% 50% 0;background:var(--pin);transform:rotate(-45deg) translateY(-.08em);margin-right:.22em;border:3px solid var(--ink)}
@@ -33,7 +33,7 @@ h1 .pin{display:inline-block;width:.62em;height:.62em;border-radius:50% 50% 50% 
 .tabs button{border:0;background:transparent;color:var(--ink);font:700 .85rem var(--body);padding:7px 14px;border-radius:999px;cursor:pointer}
 .tabs button[aria-pressed="true"]{background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.12)}
 
-.settings{display:flex;flex-direction:column;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.settings{max-width:620px;display:flex;flex-direction:column;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
 .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;width:100%}
 .chip{border:1px solid var(--line);background:var(--bg);color:var(--ink);font:400 .88rem var(--body);padding:6px 11px;border-radius:999px;cursor:pointer}
@@ -54,14 +54,14 @@ h1 .pin{display:inline-block;width:.62em;height:.62em;border-radius:50% 50% 50% 
 
 .stage{position:sticky;top:0;z-index:2;background:var(--bg);display:flex;flex-direction:column;gap:8px;padding-block:6px}
 .plate{background:var(--surface);border:1px solid var(--line);border-radius:18px;min-height:140px;display:flex;align-items:center;justify-content:center;padding:18px;text-align:center}
-.bigflag{font-family:var(--flag);font-size:clamp(5rem,22vw,7rem);line-height:1}
+.bigflag{font-family:var(--flag);font-size:clamp(10rem,44vw,14rem);line-height:1}
 .bigname{font-family:var(--display);font-weight:800;font-size:clamp(1.6rem,7vw,2.4rem);line-height:1.1;text-wrap:balance}
 .prompt{font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:6px}
 
 .answers{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
 .ans{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:700 .92rem var(--body);padding:8px 10px;border-radius:10px;cursor:pointer;text-align:left;min-height:44px;min-width:0;overflow-wrap:anywhere}
-.answers.flags{grid-template-columns:repeat(auto-fill,minmax(76px,1fr))}
-.answers.flags .ans{text-align:center;padding:6px;font-family:var(--flag);font-size:2.6rem;line-height:1;font-weight:400;min-height:64px}
+.answers.flags{grid-template-columns:repeat(auto-fill,minmax(152px,1fr))}
+.answers.flags .ans{text-align:center;padding:6px;font-family:var(--flag);font-size:5.2rem;line-height:1;font-weight:400;min-height:128px}
 .ans:hover:not(:disabled){border-color:var(--ink)}
 .ans.right{border-color:var(--good);background:var(--good-bg)}
 .ans.wrong{border-color:var(--bad);background:var(--bad-bg)}
@@ -84,6 +84,12 @@ h1 .pin{display:inline-block;width:.62em;height:.62em;border-radius:50% 50% 50% 
 .card .tag{font-size:.68rem;color:var(--muted);display:block;text-transform:uppercase;letter-spacing:.06em}
 .foot{font-size:.8rem;color:var(--muted);max-width:60ch}
 .up{align-self:flex-start;text-decoration:none}
+/* Wide screens: question pinned on the left, the full option grid fills the rest */
+@media (min-width:900px){
+  #game>.wrap{display:grid;grid-template-columns:minmax(280px,360px) 1fr;gap:14px 20px;align-items:start}
+  #game .rail,#game .bar{grid-column:1/-1}
+  #game .stage{top:12px}
+}
 @media (prefers-reduced-motion: reduce){ .bar span{transition:none} }
 </style>
 
