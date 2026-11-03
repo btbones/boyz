@@ -12,3 +12,4 @@ The vocab words came from these Quizlet sets:
 - **Chapter 7 (Mental Health), 23 terms:** [Ch 7 health Flashcards](https://quizlet.com/1008970332/ch-7-health-flash-cards/)
 - **Chapter 8 (Nutrition), 46 terms:** [Health ch 8 Flashcards](https://quizlet.com/1017905832/health-ch-8-flash-cards/)
 - **Chapter 9 (Body Image), 14 terms:** typed in directly, no Quizlet set
+- **Chapter 10 (Physical Activity), 32 terms:** [Health ch 10 Flashcards](https://quizlet.com/1025763909/health-ch-10-flash-cards/)
